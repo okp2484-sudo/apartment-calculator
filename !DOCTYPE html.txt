@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>좋은 아파트 점수 계산기</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 600px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto; }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; color: #444; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        .result-box { margin-top: 25px; padding: 15px; background: #e9ecef; border-radius: 8px; text-align: center; display: none; }
+        .score { font-size: 32px; font-weight: bold; color: #007bff; }
+        .grade { font-size: 18px; font-weight: bold; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏢 좋은 아파트 점수 계산기</h2>
+    
+    <div class="form-group">
+        <label for="transport">1. 교통 (20점 만점)</label>
+        <select id="transport">
+            <option value="20">초역세권 (도보 5분 이내 / 더블역세권 이상)</option>
+            <option value="15">역세권 (도보 10분 이내)</option>
+            <option value="10">준역세권 (버스로 지하철 이동 필요)</option>
+            <option value="5">대중교통 불편 지역</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="school">2. 학군 (20점 만점)</label>
+        <select id="school">
+            <option value="20">초품아 (초등학교 품은 단지) + 대형 학원가 도보권</option>
+            <option value="15">초등학교 도보 5분 이내 + 학원가 가깝음</option>
+            <option value="10">초등학교 도보 10분 이내</option>
+            <option value="5">학교 및 학원가 멀음</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="infra">3. 상권 및 편의시설 (15점 만점)</label>
+        <select id="infra">
+            <option value="15">대형마트, 종합병원, 대형공원 모두 도보권/차량 5분</option>
+            <option value="10">기본적인 상권 및 인근 공원 형성</option>
+            <option value="5">주요 인프라 이용 시 차량 이동 필수</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="brand">4. 브랜드 및 세대수 (15점 만점)</label>
+        <select id="brand">
+            <option value="15">1군 대기업 브랜드 + 1,000세대 이상</option>
+            <option value="12">1군 브랜드 또는 1,000세대 이상 중 하나만 충족</option>
+            <option value="8">중소 브랜드 + 500~1,000세대 미만</option>
+            <option value="5">나홀로 아파트 또는 소규모 단지 (500세대 미만)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="floor">5. 향 및 층수 (15점 만점)</label>
+        <select id="floor">
+            <option value="15">남향/남동향/남서향 + 로얄층 (전체 층의 30%~80%)</option>
+            <option value="10">동향/서향 + 로얄층 또는 남향 + 저층/고층</option>
+            <option value="5">북향 또는 1층/탑층</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="age">6. 연식 및 주차 (15점 만점)</label>
+        <select id="age">
+            <option value="15">신축 (5년 이내) + 세대당 주차 1.3대 이상</option>
+            <option value="12">준신축 (10년 이내) + 세대당 주차 1.2대 이상</option>
+            <option value="8">구축 (10~20년) + 세대당 주차 1대 이상</option>
+            <option value="5">20년 이상 구축 + 주차난 심함</option>
+        </select>
+    </div>
+
+    <button onclick="calculateScore()">아파트 점수 계산하기</button>
+
+    <div class="result-box" id="resultBox">
+        <div>총점</div>
+        <div class="score" id="scoreDisplay">0점</div>
+        <div class="grade" id="gradeDisplay"></div>
+    </div>
+</div>
+
+<script>
+    function calculateScore() {
+        const transport = parseInt(document.getElementById('transport').value);
+        const school = parseInt(document.getElementById('school').value);
+        const infra = parseInt(document.getElementById('infra').value);
+        const brand = parseInt(document.getElementById('brand').value);
+        const floor = parseInt(document.getElementById('floor').value);
+        const age = parseInt(document.getElementById('age').value);
+
+        const totalScore = transport + school + infra + brand + floor + age;
+
+        let grade = '';
+        let color = '';
+
+        if (totalScore >= 90) {
+            grade = '🌟 S등급 (매우 우수한 입지 및 상품성)';
+            color = '#28a745';
+        } else if (totalScore >= 75) {
+            grade = '👍 A등급 (우수한 입지/실거주 및 투자 양호)';
+            color = '#007bff';
+        } else if (totalScore >= 60) {
+            grade = '👌 B등급 (보통 수준의 아파트)';
+            color = '#ffc107';
+        } else {
+            grade = '⚠️ C등급 (입지 요소나 상품성 보완 필요)';
+            color = '#dc3545';
+        }
+
+        document.getElementById('scoreDisplay').innerText = totalScore + '점 / 100점';
+        document.getElementById('gradeDisplay').innerText = grade;
+        document.getElementById('gradeDisplay').style.color = color;
+        document.getElementById('resultBox').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

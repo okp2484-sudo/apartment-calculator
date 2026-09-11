@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아파트 현재가치 평가 계산기</title>
+    <style>
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 680px; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); margin: 0 auto; }
+        h2 { text-align: center; color: #111; margin-bottom: 8px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 24px; }
+        
+        .section-title { font-size: 16px; font-weight: bold; color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 6px; margin-top: 24px; margin-bottom: 16px; }
+        
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #444; }
+        select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; background-color: #fff; cursor: pointer; }
+        select:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        
+        button { width: 100%; padding: 14px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 24px; transition: background 0.2s; }
+        button:hover { background-color: #0056b3; }
+        
+        .result-box { margin-top: 28px; padding: 20px; background: #f1f3f5; border-radius: 12px; text-align: center; display: none; }
+        .score-label { font-size: 14px; color: #666; }
+        .score { font-size: 36px; font-weight: 800; color: #007bff; margin: 6px 0; }
+        .grade { font-size: 18px; font-weight: 700; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏢 아파트 현재가치 평가 계산기</h2>
+    <div class="subtitle">입지, 거래량, 인프라 등 12가지 항목 기반 100점 만점 진단</div>
+
+    <!-- 1. 주요 항목 (56점) -->
+    <div class="section-title">📌 주요 항목 (총 56점)</div>
+
+    <div class="form-group">
+        <label for="traffic">1. 교통 환경 (12점 만점)</label>
+        <select id="traffic">
+            <option value="12">12점 - 초역세권(도보 5분) / 주요 도심 직결 다중 노선</option>
+            <option value="9">9점 - 역세권(도보 10분 이내)</option>
+            <option value="6">6점 - 준역세권(도보 15분 / 버스 연계 필요)</option>
+            <option value="3">3점 - 대중교통 접근성 낮음</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="volume">2. 거래량 (12점 만점)</label>
+        <select id="volume">
+            <option value="12">12점 - 환금성 최상 (월평균 거래량 풍부, 지역 대표 단지)</option>
+            <option value="9">9점 - 거래 원활 (지속적 거래 발생)</option>
+            <option value="6">6점 - 거래 보통 (시장에 따라 기복 있음)</option>
+            <option value="3">3점 - 거래 침체 (환금성 떨어짐)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="priceIncrease">3. 매매가 상승률 (12점 만점)</label>
+        <select id="priceIncrease">
+            <option value="12">12점 - 권역 내 시세 상승률 상위 10% 이내 (시세 견인)</option>
+            <option value="9">9점 - 지역 평균 이상 상승률 유지</option>
+            <option value="6">6점 - 지역 평균 수준 상승률</option>
+            <option value="3">3점 - 시세 정체 또는 상승률 하위권</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="school">4. 학군·교육 (10점 만점)</label>
+        <select id="school">
+            <option value="10">10점 - 초품아(단지 안/바로 앞 초교) + 대형 학원가 도보권</option>
+            <option value="8">8점 - 초등학교 도보 5분 + 학원가 접근성 양호</option>
+            <option value="5">5점 - 초등학교 도보 10분 이내</option>
+            <option value="2">2점 - 학교 및 학원가와 거리가 묨</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="scale">5. 단지 규모 (10점 만점)</label>
+        <select id="scale">
+            <option value="10">10점 - 1,500세대 이상 대단지</option>
+            <option value="8">8점 - 1,000세대 ~ 1,499세대</option>
+            <option value="5">5점 - 500세대 ~ 999세대</option>
+            <option value="2">2점 - 500세대 미만 (소규모/나홀로)</option>
+        </select>
+    </div>
+
+    <!-- 2. 보조 항목 (44점) -->
+    <div class="section-title">🔹 보조 항목 (총 44점)</div>
+
+    <div class="form-group">
+        <label for="age">6. 준공 연차 (8점 만점)</label>
+        <select id="age">
+            <option value="8">8점 - 신축 (5년 이내)</option>
+            <option value="6">6점 - 준신축 (6년 ~ 10년)</option>
+            <option value="4">4점 - 구축 (11년 ~ 20년)</option>
+            <option value="2">2점 - 20년 초과 구축</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="jeonseRatio">7. 전세가율·임대수요 (8점 만점)</label>
+        <select id="jeonseRatio">
+            <option value="8">8점 - 전세가율 70% 이상 (투자금 적고 하방지지 탄탄)</option>
+            <option value="6">6점 - 전세가율 60% ~ 69% (수요 안정적)</option>
+            <option value="4">4점 - 전세가율 50% ~ 59% (수요 보통)</option>
+            <option value="2">2점 - 전세가율 50% 미만 (갭투자 부담/수요 약함)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="brand">8. 브랜드 (7점 만점)</label>
+        <select id="brand">
+            <option value="7">7점 - 1군 상위 브랜드 (래미안, 자이, 힐스테이트 등)</option>
+            <option value="5">5점 - 중견 / 지방 유공 브랜드</option>
+            <option value="3">3점 - 소형 건설사 / 자체 브랜드</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="infra">9. 생활 인프라 (7점 만점)</label>
+        <select id="infra">
+            <option value="7">7점 - 대형마트·종합병원·대형공원 도보/차량 5분 이내</option>
+            <option value="5">5점 - 주요 상권 및 편의시설 인근 위치</option>
+            <option value="3">3점 - 편의시설 이용 시 먼 거리 이동 필요</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="development">10. 개발호재·정비 사업 (7점 만점)</label>
+        <select id="development">
+            <option value="7">7점 - 확실한 호재 진행 중 (GTX 착공/재건축 착공 등)</option>
+            <option value="5">5점 - 호재 계획 확정 (구역 지정/발표 단계)</option>
+            <option value="3">3점 - 장기 과제 또는 개발 호재 미비</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="viewOrient">11. 조망·향 (4점 만점)</label>
+        <select id="viewOrient">
+            <option value="4">4점 - 남향 위주 + 영구 조망권 (강, 산, 공원 뷰 등)</option>
+            <option value="3">3점 - 남향/남동·남서향 + 일반 조망</option>
+            <option value="2">2점 - 동/서향 또는 조망이 막힌 세대</option>
+            <option value="1">1점 - 북향 또는 1층/저층</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="supplyRisk">12. 공급 리스크 (3점 만점)</label>
+        <select id="supplyRisk">
+            <option value="3">3점 - 향후 3년 내 주변 입주 물량 없음 (공급 부족)</option>
+            <option value="2">2점 - 적정 수준의 공급 예정</option>
+            <option value="1">1점 - 대규모 입주 물량 대기 (전세/매매가 리스크)</option>
+        </select>
+    </div>
+
+    <button onclick="calculateValueScore()">현재가치 점수 계산하기</button>
+
+    <div class="result-box" id="resultBox">
+        <div class="score-label">현재가치 총점</div>
+        <div class="score" id="scoreDisplay">0점 / 100점</div>
+        <div class="grade" id="gradeDisplay"></div>
+    </div>
+</div>
+
+<script>
+    function calculateValueScore() {
+        const ids = [
+            'traffic', 'volume', 'priceIncrease', 'school', 'scale',
+            'age', 'jeonseRatio', 'brand', 'infra', 'development', 'viewOrient', 'supplyRisk'
+        ];
+
+        let totalScore = 0;
+        ids.forEach(id => {
+            totalScore += parseInt(document.getElementById(id).value);
+        });
+
+        let grade = '';
+        let color = '';
+
+        if (totalScore >= 85) {
+            grade = '🌟 S등급: 최상급 현재가치 (상승 견인 및 환금성 최고 단지)';
+            color = '#28a745';
+        } else if (totalScore >= 70) {
+            grade = '👍 A등급: 우수한 현재가치 (실거주 및 투자 가치 뛰어남)';
+            color = '#007bff';
+        } else if (totalScore >= 55) {
+            grade = '👌 B등급: 보통 수준의 단지 (입지/상품성 일부 보완 필요)';
+            color = '#ffc107';
+        } else {
+            grade = '⚠️ C등급: 투자 및 보유 시 신중한 검토 필요';
+            color = '#dc3545';
+        }
+
+        document.getElementById('scoreDisplay').innerText = totalScore + '점 / 100점';
+        document.getElementById('gradeDisplay').innerText = grade;
+        document.getElementById('gradeDisplay').style.color = color;
+        document.getElementById('resultBox').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
